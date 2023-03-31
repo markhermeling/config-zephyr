@@ -22,8 +22,8 @@ pipeline {
                 sh '''
                   west update
 
-                  if [ ! -d ../codesonar_zephyr ]; 
-                   	then mkdir ../codesonar_zephyr
+                  if [ ! -d codesonar_zephyr ]; 
+                   	then mkdir codesonar_zephyr
                    fi
                    
                    export PATH=$PATH:/opt/toolchains/zephyr-sdk-0.16.0
