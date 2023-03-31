@@ -1,0 +1,79 @@
+pipeline {
+   
+   agent {
+        docker {
+            image 'canuckmh/codesonar-c-src:7.2p0'
+            registryUrl "https://registry.hub.docker.com"
+            registryCredentialsId "dockermh"
+            args  '--net="world_world-net" -v world_project-storage:/home/codesonar/projects --cpus 12'
+        }
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+               checkout scm: [$class: 'GitSCM', 
+                    userRemoteConfigs: [[credentialsId: 'Github', url: 'https://github.com/markhermeling/config-zephyr']],
+                    extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'config-zephyr']],
+                    branches: [[name: '*/main']]], poll: false
+
+                checkout scm: [$class: 'GitSCM', 
+                    userRemoteConfigs: [[url: 'https://github.com/zephyrproject-rtos/zephyr']],
+                    extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'zephyr']],
+                    branches: [[name: "*/v3.3-branch"]]], poll: false
+                
+                sh '''
+                  cd zephyr; 
+                  
+                  ./Configure
+
+                  if [ ! -d ../codesonar_zephyr ]; 
+                   	then mkdir ../codesonar_zephyr
+                   fi
+                   
+                   make clean
+                   
+                   
+                   NAME=$(date "+%Y.%m.%d-%H.%M")
+                   echo $NAME > analysis_name
+
+                   /opt/codesonar/codesonar/bin/codesonar build \
+                  	../codesonar_zephyr/daily-3.3 \
+                  	-foreground -clean \
+                      -preset stable_results \
+                  	-project "Zephyr/daily-3.3" \
+                   	-name "${NAME}" \
+                  	-conf-file ../config-zephyr/zephyr.conf \
+                     	http://world_hub_1:7340 make -j$(nproc) || true
+                '''
+                }
+              }
+              stage ('Analyze') {
+                 steps {
+                 
+                 sh '''
+                     cd openssl
+                     NAME=`cat analysis_name`
+                     HASH=$(git rev-parse --short --verify HEAD)
+                     
+                     /opt/codesonar/codesonar/bin/codesonar analyze \
+                  	../codesonar_zephyr/daily-3.3 \
+                  	-foreground \
+                     -preset concurrency -preset thorough\
+                     -preset stable_results \
+                  	-project "Zephyr/daily-3.3" \
+                     -remote-archive "/store/*" \
+                   	-name "${NAME}" \
+                     -property commitId ${HASH} \
+                  	-conf-file ../config-zephyr/zephyr.conf \
+                     	http://world_hub_1:7340 
+                        
+                '''
+      
+         
+          
+            }
+        
+       }
+    }  
+}
