@@ -2,7 +2,7 @@ pipeline {
    
    agent {
         docker {
-            image 'canuckmh/codesonar-c-src:7.2p0'
+            image 'canuckmh/codesonar-zephyr:7.3rc0'
             registryUrl "https://registry.hub.docker.com"
             registryCredentialsId "dockermh"
             args  '--net="world_world-net" -v world_project-storage:/home/codesonar/projects --cpus 12'
