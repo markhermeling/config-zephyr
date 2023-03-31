@@ -50,8 +50,11 @@ pipeline {
                  steps {
                  
                  sh '''
-                     cd zephyr
+
                      NAME=`cat analysis_name`
+                     
+                     cd zephyr
+                     
                      HASH=$(git rev-parse --short --verify HEAD)
                      
                      /opt/codesonar-7.3p0/codesonar/bin/codesonar analyze \
