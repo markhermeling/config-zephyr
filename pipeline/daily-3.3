@@ -26,20 +26,20 @@ pipeline {
                    	then mkdir ../codesonar_zephyr
                    fi
                    
-                   
-                   
+                   export PATH=$PATH:/opt/toolchains/zephyr-sdk-0.16.0
                    
                    NAME=$(date "+%Y.%m.%d-%H.%M")
                    echo $NAME > analysis_name
+                   
+                   cd zephyr
 
                    /opt/codesonar/codesonar/bin/codesonar build \
                   	../codesonar_zephyr/daily-3.3 \
                   	-foreground -clean \
-                      -preset stable_results \
                   	-project "Zephyr/daily-3.3" \
                    	-name "${NAME}" \
                   	-conf-file ../config-zephyr/zephyr.conf \
-                     	http://world_hub_1:7340 make -j$(nproc) || true
+                     	http://world_hub_1:7340 west build --pristine -b twr_ke18f samples/modules/canopennode || true
                 '''
                 }
               }
