@@ -33,7 +33,7 @@ pipeline {
                    
                    cd zephyr
 
-                   /opt/codesonar/codesonar/bin/codesonar build \
+                   /opt/codesonar-7.3p0/codesonar/bin/codesonar build \
                   	../codesonar_zephyr/daily-3.3 \
                   	-foreground -clean \
                   	-project "Zephyr/daily-3.3" \
@@ -51,7 +51,7 @@ pipeline {
                      NAME=`cat analysis_name`
                      HASH=$(git rev-parse --short --verify HEAD)
                      
-                     /opt/codesonar/codesonar/bin/codesonar analyze \
+                     /opt/codesonar-7.3p0/codesonar/bin/codesonar analyze \
                   	../codesonar_zephyr/daily-3.3 \
                   	-foreground \
                      -preset concurrency -preset thorough\
