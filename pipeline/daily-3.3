@@ -20,7 +20,8 @@ pipeline {
       
                 
                 sh '''
-                /opt/toolchains/zephyr-sdk-0.16.0/setup.sh -t all
+                  /opt/toolchains/zephyr-sdk-0.16.0/setup.sh -t all
+
                   west update
 
                   if [ ! -d codesonar_zephyr ]; 
@@ -33,6 +34,7 @@ pipeline {
                    echo $NAME > analysis_name
                    
                    cd zephyr
+                   rm -rf build
 
                    /opt/codesonar-7.3p0/codesonar/bin/codesonar build \
                   	../codesonar_zephyr/daily-3.3 \
