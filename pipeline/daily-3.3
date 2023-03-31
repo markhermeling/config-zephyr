@@ -17,21 +17,16 @@ pipeline {
                     extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'config-zephyr']],
                     branches: [[name: '*/main']]], poll: false
 
-                checkout scm: [$class: 'GitSCM', 
-                    userRemoteConfigs: [[url: 'https://github.com/zephyrproject-rtos/zephyr']],
-                    extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'zephyr']],
-                    branches: [[name: "*/v3.3-branch"]]], poll: false
+      
                 
                 sh '''
-                  cd zephyr; 
-                  
-                  ./Configure
+                  west update
 
                   if [ ! -d ../codesonar_zephyr ]; 
                    	then mkdir ../codesonar_zephyr
                    fi
                    
-                   make clean
+                   
                    
                    
                    NAME=$(date "+%Y.%m.%d-%H.%M")
